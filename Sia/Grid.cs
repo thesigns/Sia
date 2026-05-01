@@ -4,9 +4,38 @@ public class Grid
 {
     public enum Neighbourhood
     {
-        VonNeumann, // 4
         Moore, // 8
+        VonNeumann, // 4
     }
+
+    public enum Topology
+    {
+        Bounded, 
+        Torus, 
+        HorizontalCylinder, 
+        VerticalCylinder
+    }
+    
+    private static readonly (int dx, int dy)[] MooreOffsets = 
+    {
+        (-1, -1), (0, -1), (1, -1),
+        (-1,  0),          (1,  0),
+        (-1,  1), (0,  1), (1,  1)
+    };
+
+    private static readonly (int dx, int dy)[] VonNeumannOffsets = 
+    {
+            (0, -1), 
+        (-1, 0), (1, 0), 
+            (0, 1)
+    };
+    
+    private static (int dx, int dy)[] GetOffsets(Neighbourhood mode) => mode switch
+    {
+        Neighbourhood.Moore => MooreOffsets,
+        Neighbourhood.VonNeumann => VonNeumannOffsets,
+        _ => throw new ArgumentOutOfRangeException(nameof(mode))
+    };
     
     public int Width { get; }
     public int Height { get; }
@@ -56,44 +85,72 @@ public class Grid
 
     public void Expand(byte color, byte intoColor, int steps, Neighbourhood mode)
     {
-        var offsets = mode == Neighbourhood.Moore
-            ? new[] { (-1,-1), (0,-1), (1,-1), (-1,0), (1,0), (-1,1), (0,1), (1,1) }
-            : new[] { (0,-1), (-1,0), (1,0), (0,1) };
-    
         while (steps-- > 0)
         {
-            for (var y = 0; y < Height; y++)
+            for (var i = 0; i < Length; i++)
             {
-                for (var x = 0; x < Width; x++)
+                if (front[i] != intoColor)
                 {
-                    var index = y * Width + x;
-                
-                    if (front[index] != intoColor)
-                    {
-                        back[index] = front[index];
-                        continue;
-                    }
-                
-                    var hasColorNeighbour = false;
-                    foreach (var (dx, dy) in offsets)
-                    {
-                        var nx = x + dx;
-                        var ny = y + dy;
-                        if ((uint)nx < (uint)Width && (uint)ny < (uint)Height
-                                                   && front[ny * Width + nx] == color)
-                        {
-                            hasColorNeighbour = true;
-                            break;
-                        }
-                    }
-                
-                    back[index] = hasColorNeighbour ? color : front[index];
+                    back[i] = front[i];
+                    continue;
                 }
+                var hasColorNeighbour = false;
+                foreach (var ni in GetNeighboursIndex(i, mode))
+                {
+                    if (front[ni] == color)
+                    {
+                        hasColorNeighbour = true;
+                        break;
+                    }
+                }
+                back[i] = hasColorNeighbour ? color : front[i];
             }
             Swap();
         }
     }
 
+    public IEnumerable<(int x, int y)> GetNeighbours(int x, int y, 
+        Neighbourhood mode = Neighbourhood.Moore, Topology topology = Topology.Bounded)
+    {
+        var offsets = GetOffsets(mode);
+        foreach (var (dx, dy) in offsets)
+        {
+            var nx = x + dx;
+            var ny = y + dy;
+
+            if (topology is Topology.Torus or Topology.HorizontalCylinder)
+            {
+                if (nx < 0) nx += Width;
+                else if (nx >= Width) nx -= Width;
+            }
+            else
+            {
+                if (nx < 0 || nx >= Width) continue;                
+            }
+            
+            if (topology is Topology.Torus or Topology.VerticalCylinder)
+            {
+                if (ny < 0) ny += Height;
+                else if (ny >= Height) ny -= Height;
+            }
+            else
+            {
+                if (ny < 0 || ny >= Height) continue;
+            }
+            
+            yield return (nx, ny);
+        }
+    }
+
+    public IEnumerable<int> GetNeighboursIndex(int index, 
+        Neighbourhood mode = Neighbourhood.Moore, Topology topology = Topology.Bounded)
+    {
+        var x = index % Width;
+        var y = index / Width;
+        foreach (var (nx, ny) in GetNeighbours(x, y, mode, topology))
+            yield return ny * Width + nx;
+    }
+    
 
     private void Swap()
     {
