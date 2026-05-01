@@ -2,17 +2,24 @@
 using Raylib_cs;
 
 const int cellSize = 8;
-const int autoStepEveryNFrames = 5;
+const int autoStepEveryNFrames = 1;
 
 var grid = new Grid(200, 100);
 
 List<Action> steps =
 [
-    () => { grid[10, 10] = 1; },
-    () => { grid[42, 12] = 2; },
+    () => { grid[50, 50] = 1; },
+    () => { grid[150, 50] = 2; },
 ];
 
-
+for (var i = 0; i < 100; i++)
+{
+    steps.Add(() =>
+    {
+        grid.Expand(1, 0, 3, Grid.Neighbourhood.VonNeumann);
+        grid.Expand(2, 0, 7, Grid.Neighbourhood.Moore);
+    });
+}
 
 
 
