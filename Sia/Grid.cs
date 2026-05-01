@@ -83,7 +83,7 @@ public class Grid
         Array.Fill(Data, value);
     }
 
-    public void Expand(byte color, byte intoColor, int steps, Neighbourhood mode)
+    public void Expand(byte color, byte intoColor, int steps, Neighbourhood mode, Topology topology = Topology.Bounded)
     {
         while (steps-- > 0)
         {
@@ -95,7 +95,7 @@ public class Grid
                     continue;
                 }
                 var hasColorNeighbour = false;
-                foreach (var ni in GetNeighboursIndex(i, mode))
+                foreach (var ni in GetNeighboursIndex(i, mode, topology))
                 {
                     if (front[ni] == color)
                     {

@@ -6,18 +6,22 @@ const int autoStepEveryNFrames = 1;
 
 var grid = new Grid(200, 100);
 
-List<Action> steps =
-[
-    () => { grid[50, 50] = 1; },
-    () => { grid[150, 50] = 2; },
-];
+List<Action> steps = [];
+
+grid[40, 30] = 1;
+grid[160, 30] = 2;
+grid[40, 70] = 3;
+grid[160, 70] = 4;
+grid[100, 50] = 5;
 
 for (var i = 0; i < 100; i++)
 {
-    steps.Add(() =>
-    {
-        grid.Expand(1, 0, 3, Grid.Neighbourhood.VonNeumann);
-        grid.Expand(2, 0, 7, Grid.Neighbourhood.Moore);
+    steps.Add(() => {
+        grid.Expand(1, 0, 1, Grid.Neighbourhood.Moore, Grid.Topology.Bounded);
+        grid.Expand(2, 0, 1, Grid.Neighbourhood.Moore, Grid.Topology.Bounded);
+        grid.Expand(3, 0, 1, Grid.Neighbourhood.Moore, Grid.Topology.Bounded);
+        grid.Expand(4, 0, 1, Grid.Neighbourhood.Moore, Grid.Topology.Bounded);
+        grid.Expand(5, 0, 1, Grid.Neighbourhood.Moore, Grid.Topology.Bounded);
     });
 }
 
