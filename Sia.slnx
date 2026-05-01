@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="Sia.Playground/Sia.Playground.csproj" />
+  <Project Path="Sia/Sia.csproj" />
+</Solution>
