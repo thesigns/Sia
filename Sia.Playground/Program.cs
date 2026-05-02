@@ -5,35 +5,43 @@ using Sia.Transformations;
 const int cellSize = 8;
 const int autoStepEveryNFrames = 1;
 
+List<Action> steps = [];
+var stepIndex = 0;
+
+
 var grid = new Grid(200, 100);
 
 const byte water = 4;
 const byte land = 3;
-const byte depression = 5;
+const byte depression = 11;
 const byte shallowWater = 10;
 
-grid.Fill(water);
-
-grid.Drunkard(water, land, 20000, Neighbourhood.VonNeumann, Topology.Torus);
-grid.Expand(water, land, 1, Neighbourhood.VonNeumann, Topology.Torus);
+steps.Add(() => grid.Fill(water));
+steps.Add(() => grid.Drunkard(water, land, 20000, Neighbourhood.VonNeumann, Topology.Torus));
+steps.Add(() => grid.Expand(water, land, 1, Neighbourhood.VonNeumann, Topology.Torus));
 
 for (var i = 0; i < 20; i++)
 {
-    grid.Drunkard(land, depression, 500, Neighbourhood.Moore, Topology.Torus);
+    steps.Add(() => grid.Drunkard(land, depression, 500, Neighbourhood.Moore, Topology.Torus));
 }
 
-grid.Expand(land, depression, 1, Neighbourhood.VonNeumann, Topology.Torus);
-grid.Replace(depression, water);
+steps.Add(() => grid.Expand(land, depression, 1, Neighbourhood.VonNeumann, Topology.Torus));
+steps.Add(() => grid.Replace(depression, water));
 
-grid.Outline(water, shallowWater, land, Neighbourhood.Moore, Topology.Torus);
+steps.Add(() => grid.Outline(water, shallowWater, land, Neighbourhood.Moore, Topology.Torus));
 
+steps.Add(() => grid.Replace(land, water));
+steps.Add(() => grid.Outline(water, land, shallowWater, Neighbourhood.VonNeumann, Topology.Torus));
+steps.Add(() => grid.Replace(shallowWater, water));
 
-List<Action> steps = [];
-
-var stepIndex = 0;
+for (var i = 0; i < 25; i++)
+{
+    steps.Add(() => grid.Outline(water, shallowWater, land, Neighbourhood.VonNeumann, Topology.Torus));
+    steps.Add(() => grid.Outline(water, land, shallowWater, Neighbourhood.Moore, Topology.Torus));
+}
 
 Raylib.InitWindow(grid.Width * cellSize, grid.Height * cellSize, "Sia Playground");
-Raylib.SetTargetFPS(30);
+Raylib.SetTargetFPS(60);
 
 bool autoMode = false;
 int frameCounter = 0;
