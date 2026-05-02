@@ -14,20 +14,12 @@ grid
     .Expand(0, 2, 8, Neighbourhood.Moore, Topology.Torus)
     .Replace(1, 0);
 
-// grid
-//     .Scatter(1, 0, 30)
-//     .Expand(0, 1, 16, Neighbourhood.VonNeumann)
-//     .Scatter(2, 1, 10)
-//     .Expand(1, 2, 8);
-//     //.Replace(2, 1);
-
-    
 List<Action> steps = [];
 
 var stepIndex = 0;
 
 Raylib.InitWindow(grid.Width * cellSize, grid.Height * cellSize, "Sia Playground");
-Raylib.SetTargetFPS(60);
+Raylib.SetTargetFPS(30);
 
 bool autoMode = false;
 int frameCounter = 0;
@@ -51,6 +43,7 @@ while (!Raylib.WindowShouldClose())
             frameCounter = 0;
         }
     }
+    grid.Scatter(2, 0, 20);
     
     Raylib.BeginDrawing();
     DrawGrid(grid);
