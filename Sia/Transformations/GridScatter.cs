@@ -2,14 +2,10 @@
 
 public static class GridScatter
 {
+    
     public static Grid Scatter(this Grid grid, byte oldValue, byte newValue, int count)
     {
-        List<int> scatterPool = [];
-        for (var i = 0; i < grid.Length; i++)
-        {
-            if (grid.Front[i] == oldValue)
-                scatterPool.Add(i);
-        }
+        var scatterPool = grid.IndicesOf(oldValue);
         
         while (scatterPool.Count > 0 && count > 0)
         {
