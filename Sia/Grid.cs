@@ -28,26 +28,32 @@ public class Grid
     public int Height { get; }
     public int Length => Width * Height;
     
+    public Random Rng { get; set; } = Random.Shared;
     
     internal byte[] Back;
     internal byte[] Front;
     internal void Swap() => (Front, Back) = (Back, Front);
     
-    public Grid(int width, int height)
+    public Grid(int width, int height, Random rng)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(width);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(height);
         
         Width = width;
         Height = height;
+        Rng = rng;
         Front = new byte[Length];
         Back = new byte[Length];
     }
+    
+    public Grid(int width, int height) : this(width, height, Random.Shared) { }
+    
 
     public Grid(Grid source)
     {
         Width = source.Width;
         Height = source.Height;
+        Rng = source.Rng;
         Front = new byte[Length];
         Back = new byte[Length];
         Array.Copy(source.Front, Front, Length);

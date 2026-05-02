@@ -7,16 +7,22 @@ const int autoStepEveryNFrames = 1;
 
 var grid = new Grid(200, 100);
 
+grid
+    .Scatter(0, 1, 100)
+    .Expand(0, 1, 4, Neighbourhood.VonNeumann)
+    .Scatter(0, 2, 100)
+    .Expand(0, 2, 8, Neighbourhood.Moore, Topology.Torus)
+    .Replace(1, 0);
 
+// grid
+//     .Scatter(1, 0, 30)
+//     .Expand(0, 1, 16, Neighbourhood.VonNeumann)
+//     .Scatter(2, 1, 10)
+//     .Expand(1, 2, 8);
+//     //.Replace(2, 1);
 
-List<Action> steps = [
-    () => { grid.Fill(1); },
-    () => { grid.Fill(2); },
-    () => { grid.Fill(3); },
-    () => { grid.Fill(4); },
-];
-
-grid.Fill(1);
+    
+List<Action> steps = [];
 
 var stepIndex = 0;
 

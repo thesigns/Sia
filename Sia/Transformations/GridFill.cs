@@ -2,9 +2,9 @@
 
 public static class GridFill
 {
-    public static Grid Fill(this Grid grid, byte value)
+    public static Grid Fill(this Grid grid, byte newValue)
     {
-        Array.Fill(grid.Front, value);
+        Array.Fill(grid.Front, newValue);
         return grid;
     }
 }
