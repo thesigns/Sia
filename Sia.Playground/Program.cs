@@ -7,12 +7,23 @@ const int autoStepEveryNFrames = 1;
 
 var grid = new Grid(200, 100);
 
-grid
-    .Scatter(0, 1, 100)
-    .Expand(0, 1, 4, Neighbourhood.VonNeumann)
-    .Scatter(0, 2, 100)
-    .Expand(0, 2, 8, Neighbourhood.Moore, Topology.Torus)
-    .Replace(1, 0);
+const byte water = 4;
+const byte land = 3;
+const byte depression = 2;
+
+grid.Fill(water);
+
+grid.Drunkard(water, land, 20000, Neighbourhood.VonNeumann, Topology.Torus);
+grid.Expand(water, land, 1, Neighbourhood.VonNeumann, Topology.Torus);
+
+for (var i = 0; i < 20; i++)
+{
+    grid.Drunkard(land, depression, 500, Neighbourhood.Moore, Topology.Torus);
+}
+
+grid.Expand(land, depression, 1, Neighbourhood.VonNeumann, Topology.Torus);
+grid.Replace(depression, water);
+
 
 List<Action> steps = [];
 
@@ -43,7 +54,6 @@ while (!Raylib.WindowShouldClose())
             frameCounter = 0;
         }
     }
-    grid.Scatter(2, 0, 20);
     
     Raylib.BeginDrawing();
     DrawGrid(grid);
