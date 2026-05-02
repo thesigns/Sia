@@ -2,19 +2,6 @@
 
 public class Grid
 {
-    public enum Neighbourhood
-    {
-        Moore, // 8
-        VonNeumann, // 4
-    }
-
-    public enum Topology
-    {
-        Bounded, 
-        Torus, 
-        HorizontalCylinder, 
-        VerticalCylinder
-    }
     
     private static readonly (int dx, int dy)[] MooreOffsets = 
     {
@@ -41,14 +28,10 @@ public class Grid
     public int Height { get; }
     public int Length => Width * Height;
     
-    /// <summary>
-    /// Raw cell data, row-major order. Index as Data[y * Width + x].
-    /// Modifying values directly bypasses InBounds checks - use the indexer for safe access.
-    /// </summary>
-    public byte[] Data => front;
     
-    private byte[] back;
-    private byte[] front;
+    internal byte[] Back;
+    internal byte[] Front;
+    internal void Swap() => (Front, Back) = (Back, Front);
     
     public Grid(int width, int height)
     {
@@ -57,57 +40,26 @@ public class Grid
         
         Width = width;
         Height = height;
-        front = new byte[Length];
-        back = new byte[Length];
+        Front = new byte[Length];
+        Back = new byte[Length];
     }
 
     public Grid(Grid source)
     {
         Width = source.Width;
         Height = source.Height;
-        front = new byte[Length];
-        back = new byte[Length];
-        Array.Copy(source.Data, Data, Length);
+        Front = new byte[Length];
+        Back = new byte[Length];
+        Array.Copy(source.Front, Front, Length);
     }
 
     public byte this[int x, int y]
     {
-        get => InBounds(x, y) ? Data[y * Width + x] : (byte)0;
-        set { if (InBounds(x, y)) Data[y * Width + x] = value; }
+        get => InBounds(x, y) ? Front[y * Width + x] : (byte)0;
+        set { if (InBounds(x, y)) Front[y * Width + x] = value; }
     }
     
-    private bool InBounds(int x, int y) => (uint)x < (uint)Width && (uint)y < (uint)Height;
-    
-    public void Fill(byte value)
-    {
-        Array.Fill(Data, value);
-    }
-
-    public void Expand(byte color, byte intoColor, int steps, Neighbourhood mode, Topology topology = Topology.Bounded)
-    {
-        while (steps-- > 0)
-        {
-            for (var i = 0; i < Length; i++)
-            {
-                if (front[i] != intoColor)
-                {
-                    back[i] = front[i];
-                    continue;
-                }
-                var hasColorNeighbour = false;
-                foreach (var ni in GetNeighboursIndex(i, mode, topology))
-                {
-                    if (front[ni] == color)
-                    {
-                        hasColorNeighbour = true;
-                        break;
-                    }
-                }
-                back[i] = hasColorNeighbour ? color : front[i];
-            }
-            Swap();
-        }
-    }
+    public bool InBounds(int x, int y) => (uint)x < (uint)Width && (uint)y < (uint)Height;
 
     public IEnumerable<(int x, int y)> GetNeighbours(int x, int y, 
         Neighbourhood mode = Neighbourhood.Moore, Topology topology = Topology.Bounded)
@@ -152,8 +104,5 @@ public class Grid
     }
     
 
-    private void Swap()
-    {
-        (front, back) = (back, front);
-    }
+
 }

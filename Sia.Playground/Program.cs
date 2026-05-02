@@ -1,32 +1,22 @@
 ﻿using Sia;
 using Raylib_cs;
+using Sia.Transformations;
 
 const int cellSize = 8;
 const int autoStepEveryNFrames = 1;
 
 var grid = new Grid(200, 100);
 
-List<Action> steps = [];
-
-grid[40, 30] = 1;
-grid[160, 30] = 2;
-grid[40, 70] = 3;
-grid[160, 70] = 4;
-grid[100, 50] = 5;
-
-for (var i = 0; i < 100; i++)
-{
-    steps.Add(() => {
-        grid.Expand(1, 0, 1, Grid.Neighbourhood.Moore, Grid.Topology.Bounded);
-        grid.Expand(2, 0, 1, Grid.Neighbourhood.Moore, Grid.Topology.Bounded);
-        grid.Expand(3, 0, 1, Grid.Neighbourhood.Moore, Grid.Topology.Bounded);
-        grid.Expand(4, 0, 1, Grid.Neighbourhood.Moore, Grid.Topology.Bounded);
-        grid.Expand(5, 0, 1, Grid.Neighbourhood.Moore, Grid.Topology.Bounded);
-    });
-}
 
 
+List<Action> steps = [
+    () => { grid.Fill(1); },
+    () => { grid.Fill(2); },
+    () => { grid.Fill(3); },
+    () => { grid.Fill(4); },
+];
 
+grid.Fill(1);
 
 var stepIndex = 0;
 
@@ -72,12 +62,15 @@ void DrawGrid(Grid g)
         {
             Color color = g[x, y] switch
             {
-                0 => Color.Black,
-                1 => Color.White,
-                2 => Color.Red,
-                3 => Color.Green,
-                4 => Color.Blue,
-                _ => Color.Yellow
+                0 => new Color(0, 0, 0),
+                1 => new Color(255, 255, 255),
+                2 => new Color(255, 0, 0),
+                3 => new Color(0, 255, 0),
+                4 => new Color(0, 0, 255),
+                5 => new Color(255, 255, 0),
+                6 => new Color(255, 0, 255),
+                7 => new Color(0, 255, 255),
+                _ => new Color(127, 127, 127),
             };
             Raylib.DrawRectangle(x * cellSize, y * cellSize, cellSize, cellSize, color);
         }
