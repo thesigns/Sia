@@ -9,7 +9,8 @@ var grid = new Grid(200, 100);
 
 const byte water = 4;
 const byte land = 3;
-const byte depression = 2;
+const byte depression = 5;
+const byte shallowWater = 10;
 
 grid.Fill(water);
 
@@ -23,6 +24,8 @@ for (var i = 0; i < 20; i++)
 
 grid.Expand(land, depression, 1, Neighbourhood.VonNeumann, Topology.Torus);
 grid.Replace(depression, water);
+
+grid.Outline(water, shallowWater, land, Neighbourhood.Moore, Topology.Torus);
 
 
 List<Action> steps = [];
@@ -79,6 +82,12 @@ void DrawGrid(Grid g)
                 5 => new Color(255, 255, 0),
                 6 => new Color(255, 0, 255),
                 7 => new Color(0, 255, 255),
+                8 => new Color(160, 0, 0),
+                9 => new Color(0, 160, 0),
+                10 => new Color(0, 0, 160),
+                11 => new Color(120, 120, 0),
+                12 => new Color(120, 0, 120),
+                13 => new Color(0, 120, 120),
                 _ => new Color(127, 127, 127),
             };
             Raylib.DrawRectangle(x * cellSize, y * cellSize, cellSize, cellSize, color);
