@@ -7,14 +7,14 @@ public class Grid
     {
         (-1, -1), (0, -1), (1, -1),
         (-1,  0),          (1,  0),
-        (-1,  1), (0,  1), (1,  1)
+        (-1,  1), (0,  1), (1,  1),
     };
 
     private static readonly (int dx, int dy)[] VonNeumannOffsets = 
     {
             (0, -1), 
-        (-1, 0), (1, 0), 
-            (0, 1)
+      (-1, 0),    (1, 0), 
+            (0,  1),
     };
     
     private static (int dx, int dy)[] GetOffsets(Neighbourhood mode) => mode switch
@@ -109,6 +109,12 @@ public class Grid
             yield return ny * Width + nx;
     }
     
-
+    public List<int> IndicesOf(byte value)
+    {
+        List<int> result = [];
+        for (var i = 0; i < Length; i++)
+            if (Front[i] == value) result.Add(i);
+        return result;
+    }
 
 }
